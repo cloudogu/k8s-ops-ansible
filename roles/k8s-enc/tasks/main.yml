@@ -1,0 +1,15 @@
+- name: capture encryption-config.yml state
+  stat:
+    path: "{{cfg_directory}}/encryption-config.yaml"
+  register: cfg
+
+- name: generate encryption key
+  shell: head -c 32 /dev/urandom | base64
+  register: cmd
+  when: cfg.stat.exists == false
+
+- name: Generating the Data Encryption Config and Key
+  template:
+    src: templates/encryption-config.yaml.j2
+    dest: "{{cfg_directory}}/encryption-config.yaml"
+  when: cfg.stat.exists == false

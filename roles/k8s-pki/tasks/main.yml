@@ -1,0 +1,126 @@
+- name: install cfssl
+  homebrew:
+    name: cfssl
+  when: ansible_distribution == "MacOSX"
+
+- name: create pki directory
+  file:
+    path: "{{ pki_directory }}"
+    state: directory
+
+- name: copy ca-config.json
+  copy:
+    src: files/ca-config.json
+    dest: "{{ pki_directory }}/ca-config.json"
+
+- name: create ca-csr.json
+  template:
+    src: templates/ca-csr.json.j2
+    dest: pki/ca-csr.json
+
+- name: create ca.pem
+  shell: cfssl gencert -initca ca-csr.json | cfssljson -bare ca
+  args:
+    chdir: "{{ pki_directory }}"
+    creates: "{{ pki_directory }}/ca.pem"
+  
+- name: create admin-csr.json
+  template:
+    src: templates/admin-csr.json.j2
+    dest: pki/admin-csr.json
+
+- name: create admin.pem
+  shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes admin-csr.json | cfssljson -bare admin
+  args:
+    chdir: "{{ pki_directory }}"
+    creates: "{{ pki_directory }}/admin.pem"
+
+- name: create worker csr.json
+  template:
+    src: templates/worker-csr.json.j2
+    dest: pki/{{ item }}-csr.json
+  with_items: "{{groups['workers']}}"
+
+- name: create admin.pem
+  shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname={{ item }},{{ hostvars[item].ansible_host }} -profile=kubernetes {{item}}-csr.json | cfssljson -bare {{item}}
+  args:
+    chdir: "{{ pki_directory }}"
+    creates: "{{ pki_directory }}/{{item}}.pem"
+  with_items: "{{groups['workers']}}"
+
+- name: create kube-controller-manager-csr.json
+  template:
+    src: templates/kube-controller-manager-csr.json.j2
+    dest: pki/kube-controller-manager-csr.json
+
+- name: create kube-controller-manager.pem
+  shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
+  args:
+    chdir: "{{ pki_directory }}"
+    creates: "{{ pki_directory }}/kube-controller-manager.pem"
+
+- name: create kube-proxy-csr.json
+  template:
+    src: templates/kube-proxy-csr.json.j2
+    dest: pki/kube-proxy-csr.json
+
+- name: create kube-proxy.pem
+  shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-proxy-csr.json | cfssljson -bare kube-proxy
+  args:
+    chdir: "{{ pki_directory }}"
+    creates: "{{ pki_directory }}/kube-proxy.pem"
+
+- name: create kube-scheduler-csr.json
+  template:
+    src: templates/kube-scheduler-csr.json.j2
+    dest: pki/kube-scheduler-csr.json
+
+- name: create kube-scheduler.pem
+  shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-scheduler-csr.json | cfssljson -bare kube-scheduler
+  args:
+    chdir: "{{ pki_directory }}"
+    creates: "{{ pki_directory }}/kube-scheduler.pem"
+
+- name: create kubernetes-csr.json
+  template:
+    src: templates/kubernetes-csr.json.j2
+    dest: pki/kubernetes-csr.json
+
+- name: initialize controller ips variable
+  set_fact:
+    controller_ips: []
+
+- name: append ansible_host's to controller ips
+  set_fact:
+    controller_ips: "{{ controller_ips + [ hostvars[item].ansible_host ] }}"
+  with_items: "{{ groups['controllers'] }}"
+
+- name: create kubernetes.pem
+  shell: >
+    cfssl gencert \
+    -ca=ca.pem \
+    -ca-key=ca-key.pem \
+    -config=ca-config.json \
+    -hostname=10.32.0.1,{{ controller_ips | join(',') }},{{kube_apiserver_public_ip}},127.0.0.1,kubernetes.default \
+    -profile=kubernetes \
+    kubernetes-csr.json | cfssljson -bare kubernetes
+  args:
+    chdir: "{{ pki_directory }}"
+    creates: "{{ pki_directory }}/kubernetes.pem"
+
+- name: create service-account-csr.json
+  template:
+    src: templates/service-account-csr.json.j2
+    dest: pki/service-account-csr.json
+
+- name: create service-account.pem
+  shell: >
+    cfssl gencert \
+    -ca=ca.pem \
+    -ca-key=ca-key.pem \
+    -config=ca-config.json \
+    -profile=kubernetes \
+    service-account-csr.json | cfssljson -bare service-account
+  args:
+    chdir: "{{ pki_directory }}"
+    creates: "{{ pki_directory }}/service-account.pem"

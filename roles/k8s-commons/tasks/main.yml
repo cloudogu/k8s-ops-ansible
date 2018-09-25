@@ -1,0 +1,60 @@
+- name: disable cloud-init manages hostname
+  lineinfile:
+    path: /etc/cloud/cloud.cfg
+    regexp: 'preserve_hostname:.*'
+    line: 'preserve_hostname: true'
+
+# TODO check ???
+- name: disable cloud-init manages ntp
+  lineinfile:
+    path: /etc/cloud/cloud.cfg
+    regexp: '- ntp'
+    state: absent
+
+- name: set cloud-init ntp_client to ntp
+  lineinfile:
+    path: /etc/cloud/cloud.cfg
+    regexp: '   ntp_client: .*'
+    line: '   ntp_client: ntp'
+
+- name: set hostname
+  hostname:
+    name: "{{inventory_hostname}}"
+
+- name: setup authorized_key
+  authorized_key:
+    user: root
+    state: present
+    key: "{{lookup('file',item)}}"
+  with_items:
+    - files/arthur_sshkey.pub
+
+- name: create kubernetes group
+  group:
+    name: kubernetes
+
+- name: create user for kubernetes service
+  user:
+    name: kubernetes
+    group: kubernetes
+    create_home: no
+    shell: /usr/sbin/nologin
+    system: yes
+
+- name: enable ubuntu universe repository
+  apt_repository:
+    repo: deb http://archive.ubuntu.com/ubuntu bionic universe
+    state: present
+
+- name: enable ubuntu universe source repository
+  apt_repository:
+    repo: deb-src http://archive.ubuntu.com/ubuntu bionic universe
+    state: present
+
+- name: ensure date and time is correct
+  include: time.yml
+
+- name: generate /etc/hosts
+  template:
+    src: templates/hosts.j2
+    dest: /etc/hosts

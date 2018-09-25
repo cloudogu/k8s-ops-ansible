@@ -1,0 +1,16 @@
+{
+  "CN": "system:node:{{ item }}",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "{{ pki_c }}",
+      "L": "{{ pki_l }}",
+      "O": "system:nodes",
+      "OU": "{{ pki_ou }}",
+      "ST": "{{ pki_st }}"
+    }
+  ]
+}

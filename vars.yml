@@ -1,0 +1,13 @@
+# must be absolute path
+cfg_directory: "{{ playbook_dir }}/cfg"
+pki_directory: "{{ playbook_dir }}/pki"
+
+kube_apiserver_public_ip: 192.168.100.50
+iface_regex: 192\.168\.100\.
+
+kubernetes_version: 1.11.3
+etcd_version: 3.3.9
+runc_version: 1.0.0-rc5
+critools_version: 1.11.1
+cniplugins_version: 0.7.1
+containerd_version: 1.1.3

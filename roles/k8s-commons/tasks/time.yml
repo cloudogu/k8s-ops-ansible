@@ -1,0 +1,14 @@
+- name: set timezone to Europe/Berlin
+  timezone:
+    name: Europe/Berlin
+
+- name: install ntp
+  apt:
+    name: ntp
+    update_cache: yes
+
+- name: ensure ntp service is runing
+  systemd:
+    name: ntp
+    state: started
+    enabled: yes

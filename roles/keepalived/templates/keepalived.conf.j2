@@ -1,0 +1,32 @@
+global_defs {
+
+}
+
+# Script used to check if HAProxy is running
+vrrp_script check_apiserver {
+  script "/usr/bin/killall -0 kube-apiserver"
+  interval 2
+  weight 2
+}
+
+# Virtual interface
+# The priority specifies the order in which the assigned interface to take over in a failover
+vrrp_instance VI_01 {
+  # SLAVE
+  state {{ keepalived_state }}
+
+  interface {{ ansible_default_ipv4.interface }}
+  virtual_router_id 51
+
+  # fail over order
+  priority {{ keepalived_priority }} 
+
+  # The virtual ip address shared between the loadbalancers
+  virtual_ipaddress {
+    {{ kube_apiserver_public_ip }}
+  }
+
+  track_script {
+    check_apiserver
+  }
+}

@@ -1,0 +1,155 @@
+- name: create kubernetes directory
+  file:
+    path: /etc/kubernetes
+    state: directory
+    owner: kubernetes
+    group: kubernetes
+    mode: 0750
+
+- name: create kubernetes config directory
+  file:
+    path: /etc/kubernetes/config
+    state: directory
+    owner: kubernetes
+    group: kubernetes
+    mode: 0750
+
+# in case of upgrade restart components with notify handler
+- name: download kubernetes control plane components
+  get_url:
+    url: "https://storage.googleapis.com/kubernetes-release/release/v{{kubernetes_version}}/bin/linux/amd64/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    owner: kubernetes
+    group: kubernetes
+    mode: 0750
+  with_items:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+    - kubectl
+
+- name: create kubernetes data directory
+  file:
+    path: /var/lib/kubernetes
+    state: directory
+    owner: kubernetes
+    group: kubernetes
+    mode: 0750
+
+- name: copy certificates
+  copy:
+    src: "{{ pki_directory }}/{{ item }}"
+    dest: /var/lib/kubernetes
+    owner: kubernetes
+    group: kubernetes
+    mode: 0640
+  with_items:
+   - ca.pem
+   - ca-key.pem
+   - kubernetes-key.pem
+   - kubernetes.pem
+   - service-account-key.pem
+   - service-account.pem
+
+- name: copy configurations
+  copy:
+    src: "{{ cfg_directory }}/{{ item }}"
+    dest: /var/lib/kubernetes
+    owner: kubernetes
+    group: kubernetes
+    mode: 0640
+  with_items:
+   - encryption-config.yaml
+   - kube-controller-manager.kubeconfig
+   - kube-scheduler.kubeconfig
+
+- name: create kube-apiserver service
+  template:
+    src: templates/kube-apiserver.service.j2
+    dest: /etc/systemd/system/kube-apiserver.service
+    mode: 0644
+  notify:
+    - reload systemd configs
+    - restart kube-apiserver service
+
+- name: create kube-controller-manager service
+  copy:
+    src: files/kube-controller-manager.service
+    dest: /etc/systemd/system/kube-controller-manager.service
+    mode: 0644
+  notify:
+    - reload systemd configs
+    - restart kube-controller-manager service
+
+- name: copy kube-scheduler configuration
+  copy:
+    src: files/kube-scheduler.yaml
+    dest: /etc/kubernetes/config/kube-scheduler.yaml
+    owner: kubernetes
+    group: kubernetes
+    mode: 0640
+
+- name: create kube-scheduler service
+  copy:
+    src: files/kube-scheduler.service
+    dest: /etc/systemd/system/kube-scheduler.service
+    mode: 0644
+  notify:
+    - reload systemd configs
+    - restart kube-scheduler service
+
+- name: enable kubernetes controlplane services
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+    daemon_reload: yes
+  with_items:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+
+- name: copy admin kubeconfig
+  copy:
+    src: "{{cfg_directory}}/admin.kubeconfig"
+    dest: /root/admin.kubeconfig
+
+- name: install python3-pip in order to install k8s ansible module
+  apt:
+    name: python3-pip
+    state: present
+
+- name: install required python modules for k8s ansible module
+  pip:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - openshift
+    - PyYAML
+
+- name: copy k8s resources
+  copy:
+    src: "files/{{ item }}"
+    dest: "/root/{{ item }}"
+  with_items:
+    - rbac-kube-apiserver.yaml
+    - kube-dns.yaml
+  run_once: true
+
+- name: create kube-flannel configuration
+  template:
+    src: templates/kube-flannel.yml.j2
+    dest: /root/kube-flannel.yml
+  run_once: true
+
+- name: apply k8s resources
+  k8s:
+    src: "/root/{{ item }}"
+    kubeconfig: /root/admin.kubeconfig
+    state: present
+  with_items:
+    - rbac-kube-apiserver.yaml
+    - kube-flannel.yml
+    - kube-dns.yaml
+  run_once: true
+

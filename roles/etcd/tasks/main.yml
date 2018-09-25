@@ -1,0 +1,73 @@
+- name: create etcd group
+  group:
+    name: etcd
+
+- name: create user for etcd service
+  user:
+    name: etcd
+    group: etcd
+    create_home: no
+    shell: /usr/sbin/nologin
+    system: yes
+  
+- name: download and unarchive etcd binaries
+  unarchive:
+    src: https://github.com/etcd-io/etcd/releases/download/v{{etcd_version}}/etcd-v{{etcd_version}}-linux-amd64.tar.gz
+    dest: /root
+    remote_src: yes
+    creates: /root/etcd-v{{etcd_version}}-linux-amd64
+
+- name: install etcd binaries
+  copy:
+    src: "/root/etcd-v{{etcd_version}}-linux-amd64/{{item}}"
+    dest: "/usr/local/bin/"
+    remote_src: yes
+    owner: etcd
+    group: etcd
+    mode: 0700
+  with_items:
+   - etcd
+   - etcdctl
+
+- name: create required directories
+  file:
+    path: "{{item}}"
+    owner: etcd
+    group: etcd
+    mode: 0750
+    state: directory
+  with_items:
+    - /etc/etcd
+    - /var/lib/etcd
+
+- name: copy certicates
+  copy:
+    src: "{{pki_directory}}/{{item}}"
+    dest: "/etc/etcd/{{item}}"
+    owner: etcd
+    group: etcd
+    mode: 0640
+  with_items:
+    - ca.pem
+    - kubernetes-key.pem
+    - kubernetes.pem
+
+- name: create systemd service
+  template:
+    src: templates/etcd.service.j2
+    dest: /etc/systemd/system/etcd.service
+    mode: 0644
+  notify:
+    - reload systemd configs
+    - restart etcd service
+
+- name: disable firewall
+  ufw:
+    state: disabled
+
+- name: enable systemd service
+  systemd:
+    name: etcd
+    enabled: yes
+    state: started
+    daemon_reload: yes

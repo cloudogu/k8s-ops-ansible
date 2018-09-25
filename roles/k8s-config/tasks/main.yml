@@ -1,0 +1,25 @@
+- name: install kubectl
+  homebrew:
+    name: kubectl
+  when: ansible_distribution == "MacOSX"
+
+- name: create configuration directory
+  file:
+    path: "{{ cfg_directory }}"
+    state: directory
+
+- name: generate kubelet configuration
+  include: kubelet.yml
+  with_items: "{{ groups['workers'] }}"
+
+- name: generate kube-proxy configuration
+  include: kube-proxy.yml
+
+- name: generate kube-controller-manager configuration
+  include: kube-controller-manager.yml
+
+- name: generate kube-scheduler configuration
+  include: kube-scheduler.yml
+
+- name: generate admin configuration
+  include: admin.yml

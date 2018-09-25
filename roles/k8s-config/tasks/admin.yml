@@ -1,0 +1,43 @@
+- name: capture config file stats
+  stat:
+    path: "{{ cfg_directory }}/admin.kubeconfig"
+  register: cfg
+
+- name: set cluster
+  shell: >
+    kubectl config set-cluster kubernetes-the-hard-way \
+    --certificate-authority="{{ pki_directory }}/ca.pem" \
+    --embed-certs=true \
+    --server=https://127.0.0.1:6443 \
+    --kubeconfig=admin.kubeconfig
+  args:
+    chdir: "{{ cfg_directory }}"
+  when: cfg.stat.exists == False
+
+- name: set credentials
+  shell: >
+    kubectl config set-credentials admin \
+    --client-certificate="{{ pki_directory }}/admin.pem" \
+    --client-key="{{ pki_directory }}/admin-key.pem" \
+    --embed-certs=true \
+    --kubeconfig=admin.kubeconfig
+  args:
+    chdir: "{{ cfg_directory }}"
+  when: cfg.stat.exists == False
+
+- name: set context
+  shell: >
+    kubectl config set-context default \
+    --cluster=kubernetes-the-hard-way \
+    --user=admin \
+    --kubeconfig=admin.kubeconfig
+  args:
+    chdir: "{{ cfg_directory }}"
+  when: cfg.stat.exists == False
+
+- name: use default context
+  shell: >
+    kubectl config use-context default --kubeconfig=admin.kubeconfig
+  args:
+    chdir: "{{ cfg_directory }}"
+  when: cfg.stat.exists == False

@@ -1,0 +1,16 @@
+{
+  "CN": "system:kube-controller-manager",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "{{ pki_c }}",
+      "L": "{{ pki_l }}",
+      "O": "system:kube-controller-manager",
+      "OU": "{{ pki_ou }}",
+      "ST": "{{ pki_st }}"
+    }
+  ]
+}
