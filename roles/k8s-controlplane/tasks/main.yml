@@ -155,6 +155,7 @@
   with_items:
     - rbac-kube-apiserver.yaml
     - coredns.yaml
+  # Only on first controller host
   run_once: true
 
 - name: create kube-flannel configuration
@@ -164,6 +165,7 @@
   run_once: true
 
 - name: apply k8s resources
+  # At this stage we have a running API server, so deploy some yamls
   k8s:
     src: "/root/{{ item }}"
     kubeconfig: /root/admin.kubeconfig
