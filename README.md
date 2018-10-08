@@ -3,7 +3,7 @@ k8sthw
 
 Kubernetes deployment automated using ansible.
 
-For now, works for Ubuntu Hosts only. 
+For now, works for Ubuntu and CentOS Hosts only. 
 The client has to be a Mac (Check for `when: ansible_distribution == "MacOSX"` and add additional tasks for installing 
 tool on e.g. ubuntu)
 
@@ -11,13 +11,15 @@ tool on e.g. ubuntu)
 
 * Defines IPs for groups workers and controllers
 * For controllers: Distinguish between keepalived master and slave and prios
-* Defines SSH user
-* Python interpreter Path, because not on PATH in Ubuntu 18.04
+
+# Group Variables (group_vars)
+* Shared variables (all.yml)
+* Defines connection details (wokers.yml und controllers.yml)
+* Python interpreter Path, because not on PATH in Ubuntu 18.04 (wokers.yml und controllers.yml)
 
 # Playbook
 
 * Defines which roles are executed on local, worker and controllers hosts
-* Passes shared vars (`vars.yml`) to each group
 * Are executed sequentially from top to bottom (2xlocal, 1 before and 1 after cluster setup)
 
 # Roles
@@ -44,8 +46,7 @@ tool on e.g. ubuntu)
 
 # Shared by workers and controllers
 
-* Pretty customer specific. TODO could be made more generic.
-* Sets NTP
+* Sets NTP and TimeZone
 * Sets hostnames
 * Creates user and group
 
@@ -84,7 +85,6 @@ Does it all: Installs runc, containerd, kubelet, kube-proxy. Sets up networking 
 * Restarts on change in k8s-controlplane (necessary for updates) realize using notify
 * Expose ip 10.244. as parameter
 * keepalived.conf check HTTP instead of process
-* Worker: Use ubuntu's underlying resolve.conf (not etc/resolve)
 
 # Use Cases
 

@@ -1,5 +1,6 @@
 ansible_user: vagrant
 ansible_ssh_pass: vagrant
 ansible_become: yes
-ansible_become_pass: vagrant
 ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+# ubuntu 18.04
+# ansible_python_interpreter=/usr/bin/python3
