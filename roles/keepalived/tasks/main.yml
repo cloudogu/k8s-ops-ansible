@@ -1,7 +1,14 @@
-- name: install keepalived package
+- name: install keepalived package (Ubuntu)
   apt:
     name: keepalived
     state: present
+  when: ansible_distribution == "Ubuntu"
+
+- name: install keepalived package (CentOS)
+  yum:
+    name: keepalived
+    state: present
+  when: ansible_distribution == "CentOS"
 
 - name: create keepalived configuration
   template:
