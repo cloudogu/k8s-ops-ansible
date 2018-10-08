@@ -1,4 +1,4 @@
-- name: install required pacakges
+- name: install required packages (Ubuntu)
   apt:
     name: "{{ item }}"
     state: present
@@ -6,6 +6,17 @@
     - socat
     - conntrack
     - ipset
+  when: ansible_distribution == "Ubuntu"
+
+- name: install required packages (CentOS)
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - socat
+    - conntrack
+    - ipset
+  when: ansible_distribution == "CentOS"
 
 - name: download kubernetes worker components
   get_url:
@@ -61,9 +72,24 @@
 - name: download containerd
   unarchive:
     src: https://github.com/containerd/containerd/releases/download/v{{containerd_version}}/containerd-{{containerd_version}}.linux-amd64.tar.gz
-    dest: /
+    dest: /root
     remote_src: yes
-    creates: /bin/containerd
+    creates: /root/bin/containerd
+
+- name: copy containerd binaries
+  copy:
+    src: /root/bin/{{item}}
+    dest: /bin/{{item}}
+    mode: 0750
+    owner: root
+    group: root
+    remote_src: yes
+  with_items:
+   - containerd
+   - containerd-release
+   - containerd-shim
+   - containerd-stress
+   - ctr
 
 - name: copy containerd configuration
   copy:
@@ -108,13 +134,14 @@
     group: kubernetes
     mode: 0640
 
-- name: create kubelet resolv.conf
-  template:
-    src: templates/resolvkube.conf.j2
-    dest: /etc/resolvkube.conf
-    owner: kubernetes
-    group: kubernetes
-    mode: 0640    
+- name: set kubelet resolv.conf to /etc/resolv.conf
+  set_fact:
+    resolvConf: /etc/resolv.conf
+
+- name: set kubelet resolv.conf to /etc/resolv.conf (Ubuntu 18.04)
+  set_fact:
+    resolvConf: /run/systemd/resolve/resolv.conf
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "18.04"
 
 - name: create kubelet configuration
   template:
@@ -123,6 +150,7 @@
     owner: kubernetes
     group: kubernetes
     mode: 0640
+  notify: restart kubelet service
 
 - name: create kubelet service
   template:
