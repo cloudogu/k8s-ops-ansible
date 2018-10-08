@@ -1,0 +1,15 @@
+- name: set hostname
+  hostname:
+    name: "{{inventory_hostname}}"
+
+- name: generate /etc/hosts (CentOS)
+  template:
+    src: templates/hosts.centos.j2
+    dest: /etc/hosts
+  when: ansible_distribution == "CentOS"
+
+- name: generate /etc/hosts (Ubuntu)
+  template:
+    src: templates/hosts.ubuntu.j2
+    dest: /etc/hosts
+  when: ansible_distribution == "Ubuntu"

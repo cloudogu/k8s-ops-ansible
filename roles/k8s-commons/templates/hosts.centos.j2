@@ -1,0 +1,12 @@
+# do not edit manually, managed by ansible
+
+127.0.0.1   {{inventory_hostname}} localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         {{inventory_hostname}} localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+{% for host in groups['controllers'] %}
+{{hostvars[host].ansible_host}}   {{host}}
+{% endfor %}
+
+{% for host in groups['workers'] %}
+{{hostvars[host].ansible_host}}   {{host}}
+{% endfor %}

@@ -2,13 +2,29 @@
   timezone:
     name: Europe/Berlin
 
-- name: install ntp
+# TODO check if ntp is the right choice for ubuntu 18.04
+- name: install ntp (Ubuntu)
   apt:
     name: ntp
     update_cache: yes
+  when: ansible_distribution == "Ubuntu"
 
-- name: ensure ntp service is runing
+- name: ensure ntp service is runing (Ubuntu)
   systemd:
     name: ntp
     state: started
     enabled: yes
+  when: ansible_distribution == "Ubuntu"
+
+- name: install ntp (CentOS)
+  yum:
+    name: ntp
+    update_cache: yes
+  when: ansible_distribution == "CentOS"
+
+- name: ensure ntpd service is runing (CentOS)
+  systemd:
+    name: ntpd
+    state: started
+    enabled: yes
+  when: ansible_distribution == "CentOS"
