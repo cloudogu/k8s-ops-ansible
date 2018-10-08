@@ -14,6 +14,7 @@
   unarchive:
     src: https://github.com/etcd-io/etcd/releases/download/v{{etcd_version}}/etcd-v{{etcd_version}}-linux-amd64.tar.gz
     dest: /root
+    # Download to remote, not local (works because src is a remote URL)
     remote_src: yes
     creates: /root/etcd-v{{etcd_version}}-linux-amd64
 
@@ -48,6 +49,7 @@
     group: etcd
     mode: 0640
   with_items:
+    # Pragmatically use same CA and certs as for apiserver
     - ca.pem
     - kubernetes-key.pem
     - kubernetes.pem
@@ -61,6 +63,7 @@
     - reload systemd configs
     - restart etcd service
 
+# Better configure all required ports
 - name: disable firewall
   ufw:
     state: disabled

@@ -1,3 +1,4 @@
+# Make sure chaning hostname survices reboot
 - name: disable cloud-init manages hostname
   lineinfile:
     path: /etc/cloud/cloud.cfg
@@ -5,6 +6,7 @@
     line: 'preserve_hostname: true'
 
 # TODO check ???
+# Preserve NTP is still used after reboot
 - name: disable cloud-init manages ntp
   lineinfile:
     path: /etc/cloud/cloud.cfg
@@ -16,6 +18,8 @@
     path: /etc/cloud/cloud.cfg
     regexp: '   ntp_client: .*'
     line: '   ntp_client: ntp'
+
+# This is where the actual config begins
 
 - name: set hostname
   hostname:

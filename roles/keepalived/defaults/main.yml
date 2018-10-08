@@ -1,2 +1,3 @@
+# If nothing is configured in inventory
 keepalived_state: SLAVE
 keepalived_priority: 100

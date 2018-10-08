@@ -22,6 +22,7 @@
   shell: cfssl gencert -initca ca-csr.json | cfssljson -bare ca
   args:
     chdir: "{{ pki_directory }}"
+    # Executes only, if not present
     creates: "{{ pki_directory }}/ca.pem"
   
 - name: create admin-csr.json

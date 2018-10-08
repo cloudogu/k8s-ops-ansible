@@ -2,7 +2,9 @@
 cfg_directory: "{{ playbook_dir }}/cfg"
 pki_directory: "{{ playbook_dir }}/pki"
 
+# virtual IP managed by keepalived
 kube_apiserver_public_ip: 192.168.100.50
+# Used for internal cluster conf (flannel)
 iface_regex: 192\.168\.100\.
 
 kubernetes_version: 1.11.3
