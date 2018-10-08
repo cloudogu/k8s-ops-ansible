@@ -1,5 +1,5 @@
 
-# Created by https://www.gitignore.io/api/osx,ansible
+# Created by https://www.gitignore.io/api/osx,ansible,vagrant
 
 ### Ansible ###
 *.retry
@@ -32,5 +32,15 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+### Vagrant ###
+# General
+.vagrant/
 
-# End of https://www.gitignore.io/api/osx,ansible
+# Log files (if you are creating logs in debug mode, uncomment this)
+# *.logs
+
+### Vagrant Patch ###
+*.box
+
+
+# End of https://www.gitignore.io/api/osx,ansible,vagrant
