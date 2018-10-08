@@ -64,6 +64,7 @@
 - name: disable firewall
   ufw:
     state: disabled
+  when: ansible_distribution == "Ubuntu"
 
 - name: enable systemd service
   systemd:
