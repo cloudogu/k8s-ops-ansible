@@ -1,14 +1,10 @@
 - hosts: local
-  vars_files:
-  - vars.yml
   roles:
   - k8s-pki
   - k8s-config
   - k8s-enc
 
 - hosts: controllers
-  vars_files:
-  - vars.yml
   roles:
   - k8s-commons
   - etcd
@@ -16,14 +12,10 @@
   - keepalived
 
 - hosts: workers
-  vars_files:
-  - vars.yml
   roles:
   - k8s-commons
   - k8s-worker
 
 - hosts: local
-  vars_files:
-  - vars.yml
   roles:
   - k8s-local
