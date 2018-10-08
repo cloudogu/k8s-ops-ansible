@@ -1,18 +1,15 @@
 - name: create kubernetes directory
   file:
-    path: /etc/kubernetes
+    path: "{{ item }}"
     state: directory
     owner: kubernetes
     group: kubernetes
     mode: 0750
-
-- name: create kubernetes config directory
-  file:
-    path: /etc/kubernetes/config
-    state: directory
-    owner: kubernetes
-    group: kubernetes
-    mode: 0750
+  with_items:
+   - /etc/kubernetes
+   - /etc/kubernetes/config
+   - /var/lib/kubernetes
+   - /var/run/kubernetes
 
 # in case of upgrade restart components with notify handler
 - name: download kubernetes control plane components
@@ -27,14 +24,6 @@
     - kube-controller-manager
     - kube-scheduler
     - kubectl
-
-- name: create kubernetes data directory
-  file:
-    path: /var/lib/kubernetes
-    state: directory
-    owner: kubernetes
-    group: kubernetes
-    mode: 0750
 
 - name: copy certificates
   copy:
@@ -173,6 +162,5 @@
   with_items:
     - rbac-kube-apiserver.yaml
     - kube-flannel.yml
-    - coredns.yaml
+  #  - coredns.yaml
   run_once: true
-
