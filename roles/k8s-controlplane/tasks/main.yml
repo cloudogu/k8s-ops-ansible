@@ -114,10 +114,31 @@
     src: "{{cfg_directory}}/admin.kubeconfig"
     dest: /root/admin.kubeconfig
 
-- name: install python3-pip in order to install k8s ansible module
+- name: install python3-pip in order to install k8s ansible module (Ubuntu)
   apt:
     name: python3-pip
     state: present
+  when: ansible_distribution == "Ubuntu"
+
+- name: install epel-release in order to install python-pip (CentOS)
+  yum:
+    name: epel-release
+    state: present
+  when: ansible_distribution == "CentOS"
+
+- name: install python-pip in order to install k8s ansible module (CentOS)
+  yum:
+    name: python-pip
+    update_cache: yes
+    state: present
+  when: ansible_distribution == "CentOS"
+
+- name: upgrade setuptools (CentOS)
+  pip:
+    name: setuptools
+    version: 40.4.3
+    state: present
+  when: ansible_distribution == "CentOS"
 
 - name: install required python modules for k8s ansible module
   pip:
