@@ -133,7 +133,7 @@
     dest: "/root/{{ item }}"
   with_items:
     - rbac-kube-apiserver.yaml
-    - kube-dns.yaml
+    - coredns.yaml
   run_once: true
 
 - name: create kube-flannel configuration
@@ -150,6 +150,6 @@
   with_items:
     - rbac-kube-apiserver.yaml
     - kube-flannel.yml
-    - kube-dns.yaml
+    - coredns.yaml
   run_once: true
 
