@@ -1,7 +1,23 @@
-- name: install cfssl
+- name: install cfssl (MacOSX)
   homebrew:
     name: cfssl
   when: ansible_distribution == "MacOSX"
+
+- name: install cfssl (Linux)
+  become: yes
+  get_url:
+    url: https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+    dest: /usr/local/bin/cfssl
+    mode: 0755
+  when: ansible_system == "Linux"
+
+- name: install cfssljson_linux (Linux)
+  become: yes
+  get_url:
+    url: https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+    dest: /usr/local/bin/cfssljson
+    mode: 0755
+  when: ansible_system == "Linux"
 
 - name: create pki directory
   file:

@@ -1,7 +1,15 @@
-- name: install kubectl
+- name: install kubectl (MacOSX)
   homebrew:
     name: kubectl
   when: ansible_distribution == "MacOSX"
+
+- name: install kubectl (Linux)
+  become: yes
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-release/release/v{{kubernetes_version}}/bin/linux/amd64/kubectl
+    dest: /usr/local/bin/kubectl
+    mode: 0755
+  when: ansible_system == "Linux"
 
 - name: create configuration directory
   file:

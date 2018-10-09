@@ -1,11 +1,14 @@
-k8sthw
+k8s-ops-ansible
 =====
 
 Kubernetes deployment automated using ansible.
 
 For now, works for Ubuntu and CentOS Hosts only. 
-The client has to be a Mac (Check for `when: ansible_distribution == "MacOSX"` and add additional tasks for installing 
-tool on e.g. ubuntu)
+The client has to be a Mac or a Linux 64bit machine.
+
+# Requirements
+
+* ansible >= 2.6
 
 # Inventory
 
