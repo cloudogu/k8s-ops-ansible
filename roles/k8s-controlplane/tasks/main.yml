@@ -162,5 +162,5 @@
   with_items:
     - rbac-kube-apiserver.yaml
     - kube-flannel.yml
-  #  - coredns.yaml
+    - coredns.yaml
   run_once: true
