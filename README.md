@@ -8,6 +8,39 @@ The client has to be a Mac or a Linux 64bit machine.
 
 Note that while this works in general, it still is **work in progress**.
 
+# Table of contents
+<!-- Update with `doctoc --notitle README.md`. See https://github.com/thlorenz/doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Requirements](#requirements)
+- [Getting started](#getting-started)
+- [Inventory](#inventory)
+- [Group Variables (group_vars)](#group-variables-group_vars)
+- [Playbook](#playbook)
+- [Roles](#roles)
+  - [Local](#local)
+    - [k8s-pki](#k8s-pki)
+    - [k8s-config](#k8s-config)
+    - [k8s-enc](#k8s-enc)
+  - [Shared by workers and controllers](#shared-by-workers-and-controllers)
+    - [k8s-commons](#k8s-commons)
+  - [Controllers](#controllers)
+    - [etcd](#etcd)
+    - [k8s-controlplane](#k8s-controlplane)
+    - [keepalived](#keepalived)
+  - [Workers](#workers)
+    - [k8s-worker](#k8s-worker)
+- [TODOs](#todos)
+- [Use Cases](#use-cases)
+  - [Update K8s version](#update-k8s-version)
+  - [Update certs](#update-certs)
+  - [...](#)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+
 # Requirements
 
 * ansible >= 2.6
@@ -69,31 +102,33 @@ Note that while this works in general, it still is **work in progress**.
 
 * Creates encryption key for secrets
 
-# Shared by workers and controllers
+## Shared by workers and controllers
+
+### k8s-commons
 
 * Sets NTP and TimeZone
 * Sets hostnames
 * Creates user and group
 
-# Controllers
+## Controllers
 
-## etcd
+### etcd
 
 Sets up etc secured with mutual certs and running as non-root.
 
-## k8s-controlplane
+### k8s-controlplane
 
 Configures and sets up services for all binaries
 
 Note: Scheduler `allocate-node-cidrs=true` and `cluster-cidr` for flannel.
 
-## keepalived
+### keepalived
 
 Provides virtual IP address for connecting to API server.
 
-#  Workers
+##  Workers
 
-## k8s-worker
+### k8s-worker
 
 Does it all: Installs runc, containerd, kubelet, kube-proxy. Sets up networking (CNI) and kubelet certificates.
 
@@ -116,6 +151,7 @@ Does it all: Installs runc, containerd, kubelet, kube-proxy. Sets up networking 
     Workaround: Delete `/usr/local/bin/kubectl` locally
   * `apply k8s resources` / `coredns.yaml`: `failed: [controller0] (item=coredns.yaml) => {"changed": false, "error": 422, "item": "coredns.yaml", "msg": "Failed to patch object: b'{\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"Deployment.apps \\\\\"coredns\\\\\" is invalid: spec.template.spec.containers[0].ports[1].name: Duplicate value: \\\\\"dns-tcp\\\\\"\",\"reason\":\"Invalid\",\"details\":{\"name\":\"coredns\",\"group\":\"apps\",\"kind\":\"Deployment\",\"causes\":[{\"reason\":\"FieldValueDuplicate\",\"message\":\"Duplicate value: \\\\\"dns-tcp\\\\\"\",\"field\":\"spec.template.spec.containers[0].ports[1].name\"}]},\"code\":422}\\n'", "reason": "Unprocessable Entity", "status": 422}`
     Workaround: `kubectl delete -f  roles/k8s-controlplane/files/coredns.yaml` 
+
 
 # Use Cases
 
