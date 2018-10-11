@@ -186,15 +186,8 @@
     - reload systemd configs
     - restart kube-proxy service
 
-- name: Remove swapfile from /etc/fstab
-  mount:
-    path: none
-    fstype: swap
-    state: absent
-
-- name: Disable swap
-  command: swapoff -a
-  when: ansible_swaptotal_mb > 0
+- name: disable swap
+  include: swap.yml
 
 - name: enable kubernetes worker services
   systemd:

@@ -1,0 +1,17 @@
+- name: Remove swap from /etc/fstab (Ubuntu)
+  mount:
+    path: none
+    fstype: swap
+    state: absent
+  when: ansible_distribution == "Ubuntu"
+
+- name: Remove swap from /etc/fstab (CentOS)
+  mount:
+    path: swap
+    fstype: swap
+    state: absent
+  when: ansible_distribution == "CentOS"
+
+- name: Disable swap
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
