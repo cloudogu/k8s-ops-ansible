@@ -3,4 +3,4 @@ ansible_ssh_pass: vagrant
 ansible_become: yes
 ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
 # ubuntu 18.04
-# ansible_python_interpreter=/usr/bin/python3
+ansible_python_interpreter: /usr/bin/python3
