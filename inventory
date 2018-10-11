@@ -2,11 +2,11 @@
   localhost ansible_connection=local
 
 [controllers]
-  controller0 ansible_host=192.168.100.100 keepalived_state=MASTER keepalived_priority=110 
-  controller1 ansible_host=192.168.100.101 keepalived_state=SLAVE keepalived_priority=105
-  controller2 ansible_host=192.168.100.102 keepalived_state=SLAVE keepalived_priority=100
+  controller-0 ansible_host=192.168.100.100 keepalived_state=MASTER keepalived_priority=110 
+  controller-1 ansible_host=192.168.100.101 keepalived_state=BACKUP keepalived_priority=105
+  controller-2 ansible_host=192.168.100.102 keepalived_state=BACKUP keepalived_priority=100
 
 [workers]
-  worker0 ansible_host=192.168.100.200
-  worker1 ansible_host=192.168.100.201
-  worker2 ansible_host=192.168.100.202
+  worker-0 ansible_host=192.168.100.200
+  worker-1 ansible_host=192.168.100.201
+  worker-2 ansible_host=192.168.100.202
