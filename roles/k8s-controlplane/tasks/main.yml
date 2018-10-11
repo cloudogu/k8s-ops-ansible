@@ -163,3 +163,6 @@
     - kube-flannel.yml
     - coredns.yaml
   run_once: true
+
+- name: configure firewall
+  include: firewall.yml

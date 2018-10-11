@@ -63,15 +63,12 @@
     - reload systemd configs
     - restart etcd service
 
-# Better configure all required ports
-- name: disable firewall
-  ufw:
-    state: disabled
-  when: ansible_distribution == "Ubuntu"
-
 - name: enable systemd service
   systemd:
     name: etcd
     enabled: yes
     state: started
     daemon_reload: yes
+
+- name: configure firewall
+  include: firewall.yml

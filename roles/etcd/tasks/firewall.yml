@@ -1,0 +1,20 @@
+# Better configure all required ports
+- name: disable firewall
+  ufw:
+    state: disabled
+  when: ansible_distribution == "Ubuntu"
+
+- name: enable firewall (CentOS)
+  systemd:
+    name: firewalld
+    enabled: yes
+    state: started
+  when: ansible_distribution == "CentOS"
+
+- name: open firewall ports for etcd (CentOS)
+  firewalld:
+    source: "{{ hostvars[item].ansible_host }}"
+    port: 2379-2380/tcp
+    state: enabled
+  with_items: "{{ groups.controllers }}"
+  when: ansible_distribution == "CentOS"

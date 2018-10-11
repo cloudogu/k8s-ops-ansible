@@ -1,0 +1,41 @@
+# Better configure all required ports
+- name: disable firewall
+  ufw:
+    state: disabled
+  when: ansible_distribution == "Ubuntu"
+
+# https://github.com/jellehoylaerts/ansible/blob/624d5a347479ad2259e786d69127b835fe6e135f/roles/haproxy/tasks/main.yml
+
+- name: enable firewall (CentOS)
+  systemd:
+    name: firewalld
+    enabled: yes
+    state: started
+  when: ansible_distribution == "CentOS"
+
+- name: Add VRRP to firewalld (CentOS)
+  firewalld:
+    port: 122/tcp
+    permanent: true
+    immediate: true
+    state: enabled
+  notify: restart firewall (CentOS)
+  when: ansible_distribution == "CentOS"
+
+- name: Add VRRP to firewalld (CentOS)
+  firewalld:
+    source: 224.0.0.18
+    permanent: true
+    immediate: true
+    state: enabled
+  notify: restart firewall (CentOS)
+  when: ansible_distribution == "CentOS"
+
+- name: Add VRRP to firewalld (CentOS)
+  firewalld:
+    rich_rule: 'rule protocol value="vrrp" accept'
+    permanent: true
+    immediate: true
+    state: enabled
+  notify: restart firewall (CentOS)
+  when: ansible_distribution == "CentOS"

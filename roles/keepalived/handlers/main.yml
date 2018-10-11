@@ -2,3 +2,8 @@
   systemd:
     name: keepalived
     state: restarted
+
+- name: restart firewall (CentOS)
+  systemd:
+    name: firewalld
+    state: restarted

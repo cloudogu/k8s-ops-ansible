@@ -1,0 +1,32 @@
+# Better configure all required ports
+- name: disable firewall
+  ufw:
+    state: disabled
+  when: ansible_distribution == "Ubuntu"
+
+- name: enable firewall (CentOS)
+  systemd:
+    name: firewalld
+    enabled: yes
+    state: started
+  when: ansible_distribution == "CentOS"
+
+# https://stackoverflow.com/questions/39293441/needed-ports-for-kubernetes-cluster
+
+- name: open firewall ports for kube-apiserver (CentOS)
+  firewalld:
+    port: 6443/tcp
+    state: enabled
+    permanent: true
+    immediate: true
+  when: ansible_distribution == "CentOS"
+
+- name: open firewall ports for kubelet api, kube-scheduler, kube-controller-manager (CentOS)
+  firewalld:
+    source: "{{ hostvars[item].ansible_host }}"
+    port: 10250-10252/tcp
+    state: enabled
+    permanent: true
+    immediate: true
+  with_items: "{{ groups.controllers }}"
+  when: ansible_distribution == "CentOS"

@@ -36,6 +36,9 @@
   notify:
     - restart keepalived service
 
+- name: configure firewall
+  include: firewall.yml
+
 - name: ensure keepalived service is running and enabled
   systemd:
     name: keepalived
