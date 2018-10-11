@@ -2,6 +2,12 @@
 cfg_directory: "{{ playbook_dir }}/cfg"
 pki_directory: "{{ playbook_dir }}/pki"
 
+# enable firewall
+# - the feature is experimental
+# - not fully implemented
+# - works currently only on centos
+firewall_enabled: false
+
 # password for keepalived authentication
 keepalived_password: secret42
 

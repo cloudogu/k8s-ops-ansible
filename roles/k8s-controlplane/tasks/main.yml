@@ -166,3 +166,4 @@
 
 - name: configure firewall
   include: firewall.yml
+  when: firewall_enabled

@@ -38,6 +38,7 @@
 
 - name: configure firewall
   include: firewall.yml
+  when: firewall_enabled
 
 - name: ensure keepalived service is running and enabled
   systemd:
