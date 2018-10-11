@@ -163,4 +163,6 @@ TODO
 
 ## Update certs
 
+## Authorize users to API server
+
 ## ...
