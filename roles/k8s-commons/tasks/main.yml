@@ -6,3 +6,9 @@
 
 - name: create group and user
   include: user.yml
+
+- name: add /usr/local/bin to PATH (CentOS)
+  lineinfile:
+    path: /etc/sudoers
+    regexp: '^Defaults.*secure_path.*$'
+    line: "Defaults    secure_path = /usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
