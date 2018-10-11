@@ -1,3 +1,5 @@
 # If nothing is configured in inventory
-keepalived_state: SLAVE
+keepalived_state: BACKUP
 keepalived_priority: 100
+keepalived_unicast: false
+keepalived_virtual_router_id: 42
