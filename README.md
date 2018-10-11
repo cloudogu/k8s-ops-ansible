@@ -38,6 +38,7 @@ Supported Kubernetes versions: 1.11.3 (see `group_vars/all.yml`).
 - [Use Cases](#use-cases)
   - [Update K8s version](#update-k8s-version)
   - [Update certs](#update-certs)
+  - [Authorize users to API server](#authorize-users-to-api-server)
   - [...](#)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -153,11 +154,6 @@ Does it all: Installs runc, containerd, kubelet, kube-proxy. Sets up networking 
     Workaround: Delete `/usr/local/bin/kubectl` locally
   * `apply k8s resources` / `coredns.yaml`: `failed: [controller0] (item=coredns.yaml) => {"changed": false, "error": 422, "item": "coredns.yaml", "msg": "Failed to patch object: b'{\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"Deployment.apps \\\\\"coredns\\\\\" is invalid: spec.template.spec.containers[0].ports[1].name: Duplicate value: \\\\\"dns-tcp\\\\\"\",\"reason\":\"Invalid\",\"details\":{\"name\":\"coredns\",\"group\":\"apps\",\"kind\":\"Deployment\",\"causes\":[{\"reason\":\"FieldValueDuplicate\",\"message\":\"Duplicate value: \\\\\"dns-tcp\\\\\"\",\"field\":\"spec.template.spec.containers[0].ports[1].name\"}]},\"code\":422}\\n'", "reason": "Unprocessable Entity", "status": 422}`
     Workaround: `kubectl delete -f  roles/k8s-controlplane/files/coredns.yaml` 
-
-## CentOS
-
-* Restarting workers seems not to work (swap space is on in `fstab`)
-* keepalived failover does not seem to work
 
 # Use Cases
 
