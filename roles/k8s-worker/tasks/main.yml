@@ -1,21 +1,19 @@
 - name: install required packages (Ubuntu)
   apt:
-    name: "{{ item }}"
+    name:
+      - socat
+      - conntrack
+      - ipset
     state: present
-  with_items:
-    - socat
-    - conntrack
-    - ipset
   when: ansible_distribution == "Ubuntu"
 
 - name: install required packages (CentOS)
   yum:
-    name: "{{ item }}"
+    name:
+      - socat
+      - conntrack
+      - ipset
     state: present
-  with_items:
-    - socat
-    - conntrack
-    - ipset
   when: ansible_distribution == "CentOS"
 
 - name: download kubernetes worker components

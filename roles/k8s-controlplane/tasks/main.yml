@@ -131,11 +131,10 @@
 
 - name: install required python modules for k8s ansible module
   pip:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - openshift
+    name:
     - PyYAML
+    - openshift
+    state: present
 
 - name: copy k8s resources
   copy:
