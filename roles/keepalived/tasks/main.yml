@@ -1,3 +1,10 @@
+- name: find target interface for keepalived
+  set_fact:
+    keepalived_interface: "{{ item }}"
+  when: hostvars[inventory_hostname]['ansible_%s' % item].ipv4.address == hostvars[inventory_hostname].ansible_host
+  with_items:
+    - "{{ ansible_interfaces }}"
+
 - name: create keepalived scripts
   group:
     name: keepalived_script

@@ -4,8 +4,6 @@ pki_directory: "{{ playbook_dir }}/pki"
 
 # password for keepalived authentication
 keepalived_password: secret42
-# interface used for keepalived communication
-keepalived_interface: eth1
 
 # virtual IP managed by keepalived
 kube_apiserver_public_ip: 192.168.100.50
