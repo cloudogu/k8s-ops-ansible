@@ -1,6 +1,6 @@
 # must be absolute path
-cfg_directory: "{{ playbook_dir }}/cfg"
-pki_directory: "{{ playbook_dir }}/pki"
+cfg_directory: "{{ playbook_dir }}/data/cfg"
+pki_directory: "{{ playbook_dir }}/data/pki"
 
 # enable firewall
 # - the feature is experimental

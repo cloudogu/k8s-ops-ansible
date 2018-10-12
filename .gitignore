@@ -44,3 +44,5 @@ Temporary Items
 
 
 # End of https://www.gitignore.io/api/osx,ansible,vagrant
+data/pki
+data/cfg
