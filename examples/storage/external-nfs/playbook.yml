@@ -1,0 +1,7 @@
+- hosts: storage
+  roles:
+  - nfs-server
+
+- hosts: local
+  roles:
+  - nfs-client-provisioner

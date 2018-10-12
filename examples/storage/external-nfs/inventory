@@ -1,0 +1,5 @@
+[local]
+localhost ansible_connection=local
+
+[storage]
+storage-0 ansible_host=192.168.100.230

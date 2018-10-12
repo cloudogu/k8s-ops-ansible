@@ -1,0 +1,46 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: rook
+spec:
+  storageClassName: rook-ceph-block
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Mi
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx-on-rook
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-on-rook
+    spec:
+      initContainers:
+      - name: content-builder
+        image: alpine:3.8
+        command: 
+        - "/bin/sh"
+        - "-c"
+        - "echo 'Hello from ceph volume' > /content/message.txt"
+        volumeMounts:
+        - name: rook
+          mountPath: "/content"
+      containers:
+      - name: nginx
+        image: nginx:1.15.5-alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        # name must match the volume name below
+        - name: rook
+          mountPath: "/usr/share/nginx/html"
+      volumes:
+      - name: rook
+        persistentVolumeClaim:
+          claimName: rook
