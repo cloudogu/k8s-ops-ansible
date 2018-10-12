@@ -1,0 +1,78 @@
+# documentation sources
+# https://www.atlantic.net/hipaa-compliant-cloud-hosting-services/how-to-vrrp-keepalived-configuration/
+# http://www.keepalived.org/manpage.html
+
+# global configurations
+global_defs {
+  # enabled security for script execution
+  # we set this mainly, because keepalived logs a warning
+  # if the parameter is missing
+  enable_script_security
+}
+
+# Script used to check if nginx is running
+vrrp_script check_nginx {
+  # fetch the health endpoint of the api server
+  # if the server returns 200, the api server is ready to serve requests
+  script "/usr/bin/curl -s http://localhost/healthz"
+
+  # execute the check script every two seconds
+  interval 2
+
+  # mark the node as failed, if the check script fails two times in a row
+  fall 2
+}
+
+# Identify the VRRP instance as, in this case, "failover_link".
+# The priority specifies the order in which the assigned interface to take over in a failover
+vrrp_instance failover_link {
+
+  # Initial state of the keepalived VRRP instance on this host
+  # (MASTER or BACKUP). Once started, only priority matters.
+  state {{ keepalived_state }}
+
+  # interface this VRRP instance is bound to.
+  interface {{ keepalived_interface }}
+
+  # Arbitrary value between 1 and 255 to distinguish this VRRP
+  # instance from others running on the same device. It must match
+  # with other peering devices. 
+  virtual_router_id 13
+
+  # Time, in seconds, between VRRP advertisements. The default is 1,
+  # but in some cases you can achieve more reliable results by
+  # increasing this value.
+  # advert_int 4
+
+  # Highest priority value takes the MASTER role and the
+  # virtual IP (default value is 100).
+  priority {{ keepalived_priority }}
+
+  # Authentication method: AH indicates ipsec Authentication Header.
+  # It offers more security than PASS, which transmits the
+  # authentication password in plaintext. Some implementations
+  # have complained of problems with AH, so it may be necessary
+  # to use PASS to get keepalived's VRRP working.
+  #
+  # The auth_pass will only use the first 8 characters entered.
+  authentication {
+    auth_type AH
+    auth_pass secretka
+  }
+
+  # Virtual IP address(es) that will be shared among VRRP
+  # members. "Dev" indicates the interface the virtual IP will
+  # be assigned to. And "label" allows for clearer description of the
+  # virtual IP.
+  virtual_ipaddress {
+    {{ lb_public_ip }} dev {{ keepalived_interface }} label {{ keepalived_interface }}:vip
+  }
+
+
+  # script to check if the node is healthy
+  track_script {
+    # script to check if the nginx is healthy
+    # the script is defined at the top of this configuration file
+    check_nginx
+  }
+}

@@ -31,7 +31,7 @@
 
 - name: create keepalived configuration
   template:
-    src: templates/keepalived.conf.j2
+    src: "{{keepalived_template}}"
     dest: /etc/keepalived/keepalived.conf
   notify:
     - restart keepalived service

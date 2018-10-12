@@ -1,0 +1,17 @@
+ansible_user: vagrant
+ansible_ssh_pass: vagrant
+ansible_become: yes
+ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+# ubuntu 18.04
+ansible_python_interpreter: /usr/bin/python3
+
+lb_public_ip: 192.168.100.245
+keepalived_template: roles/keepalived/templates/keepalived.conf.j2
+firewall_enabled: false
+
+worker_nodes:
+ - 192.168.100.200
+ - 192.168.100.201
+ - 192.168.100.202
+
+node_port: 32080

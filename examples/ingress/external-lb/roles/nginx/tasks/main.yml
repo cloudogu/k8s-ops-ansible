@@ -1,0 +1,43 @@
+- name: install nginx repository key
+  apt_key:
+    url: http://nginx.org/keys/nginx_signing.key
+    state: present
+
+- name: install nginx repository
+  apt_repository:
+    repo: deb [arch=amd64] http://nginx.org/packages/mainline/ubuntu/ bionic nginx
+    state: present
+
+- name: install nginx source repository
+  apt_repository:
+    repo: deb-src [arch=amd64] http://nginx.org/packages/mainline/ubuntu/ bionic nginx
+    state: present
+
+- name: install nginx
+  apt:
+    name: nginx
+    update_cache: yes
+
+- name: remove default nginx configuration
+  file:
+    path: /etc/nginx/conf.d/default.conf
+    state: absent
+  notify: restart nginx
+
+- name: create ingress endpoint
+  template:
+    src: templates/ingress.conf
+    dest: /etc/nginx/conf.d/ingress.conf
+  notify: restart nginx
+
+- name: install healthz endpoint
+  copy:
+    src: files/healthz.conf
+    dest: /etc/nginx/conf.d/healthz.conf
+  notify: restart nginx
+
+- name: enable nginx service
+  systemd:
+    name: nginx
+    state: started
+    enabled: true

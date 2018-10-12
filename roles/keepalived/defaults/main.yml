@@ -3,3 +3,4 @@ keepalived_state: BACKUP
 keepalived_priority: 100
 keepalived_unicast: false
 keepalived_virtual_router_id: 42
+keepalived_template: templates/keepalived.conf.j2
