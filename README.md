@@ -10,6 +10,8 @@ Note that while this works in general, it still is **work in progress**.
 
 Supported Kubernetes versions: 1.11.3 (see `group_vars/all.yml`).
 
+For advanced topics (such as nfs, rook, external load balancer), see the `examples` folder.
+
 # Table of contents
 <!-- Update with `doctoc --notitle README.md`. See https://github.com/thlorenz/doctoc -->
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
